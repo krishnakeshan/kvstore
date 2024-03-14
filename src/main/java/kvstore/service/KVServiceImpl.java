@@ -1,23 +1,21 @@
-package kvstore;
+package kvstore.service;
 
 import command.request.Command;
 import command.request.kv.DeleteKeyCommand;
 import command.request.kv.GetKeyCommand;
 import command.request.kv.PutKeyCommand;
-import command.response.CommandResponse;
 import command.response.CommandResponseCallback;
 import command.response.kv.DeleteKeyCommandResponse;
 import command.response.kv.GetKeyCommandResponse;
 import command.response.kv.PutKeyCommandResponse;
+import kvstore.ConcurrentHashMapKVStore;
+import kvstore.HashMapKVStore;
+import kvstore.KVStore;
 
 public class KVServiceImpl implements KVService {
-    public static KVServiceImpl hashMapKVService() {
-        return new KVServiceImpl(new HashMapKVStore());
-    }
+    private KVStore kvStore;
 
-    private final KVStore kvStore;
-
-    private KVServiceImpl(KVStore kvStore) {
+    public KVServiceImpl(KVStore kvStore) {
         this.kvStore = kvStore;
     }
 
@@ -38,8 +36,14 @@ public class KVServiceImpl implements KVService {
                 responseCallback.onResponse(new DeleteKeyCommandResponse(true));
             }
             default -> {
+                System.out.println("unknown command");
             }
         }
+    }
+
+    @Override
+    public void setKvStore(KVStore kvStore) {
+        this.kvStore = kvStore;
     }
 
     private void putKey(String key, Object value) {

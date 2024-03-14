@@ -1,13 +1,12 @@
 package command.controller;
 
 import command.request.Command;
-import kvstore.KVService;
+import kvstore.service.KVService;
 
 public class CommandControllerImpl extends CommandController {
-    private final KVService kvService;
 
     public CommandControllerImpl(KVService kvService) {
-        this.kvService = kvService;
+        super(kvService);
     }
 
     @Override

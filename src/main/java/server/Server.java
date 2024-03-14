@@ -8,7 +8,7 @@ import command.request.kv.PutKeyCommand;
 import command.response.kv.DeleteKeyCommandResponse;
 import command.response.kv.GetKeyCommandResponse;
 import command.response.kv.PutKeyCommandResponse;
-import config.Config;
+import util.TypeUtils;
 
 import java.io.*;
 import java.net.InetSocketAddress;
@@ -19,8 +19,6 @@ import java.util.Objects;
 import java.util.Set;
 
 public class Server {
-    private final Config config = Config.getInstance();
-
     private final HttpServer httpServer;
 
     private final CommandController commandController;
@@ -31,10 +29,9 @@ public class Server {
             putMethodFilter = new HttpMethodFilter(HttpMethod.PUT),
             deleteMethodFilter = new HttpMethodFilter(HttpMethod.DELETE);
 
-    public Server() throws IOException {
-        int port = config.getServerPort();
+    public Server(int port, CommandController commandController) throws IOException {
         this.httpServer = HttpServer.create(new InetSocketAddress(port), 0);
-        this.commandController = CommandController.getDefault();
+        this.commandController = commandController;
 
         registerEndpoints();
     }
@@ -43,6 +40,11 @@ public class Server {
         InetSocketAddress address = httpServer.getAddress();
         System.out.printf("Starting HTTP server at %s:%d%n", address.getHostName(), address.getPort());
         httpServer.start();
+    }
+
+    public void stop() {
+        System.out.println("stopping server");
+        httpServer.stop(0);
     }
 
     private void registerEndpoints() {
@@ -69,7 +71,6 @@ public class Server {
     private void handlePostKey(HttpExchange exchange) {
         String key = getKeyFromUri(exchange.getRequestURI());
         Object value = getValueFromRequestBody(exchange.getRequestBody());
-        System.out.println("POST key " + key + " " + value);
         PutKeyCommand putKeyCommand = new PutKeyCommand(key, value, commandResponse -> {
             if (commandResponse instanceof PutKeyCommandResponse response) {
                 if (response.isSuccessful()) {
@@ -93,7 +94,6 @@ public class Server {
 
     private void handleGetKey(HttpExchange exchange) {
         String key = getKeyFromUri(exchange.getRequestURI());
-        System.out.println("GET key " + key);
         GetKeyCommand getKeyCommand = new GetKeyCommand(key, commandResponse -> {
             if (commandResponse instanceof GetKeyCommandResponse response) {
                 if (response.isSuccessful()) {
@@ -116,7 +116,6 @@ public class Server {
 
     private void handleDeleteKey(HttpExchange exchange) {
         String key = getKeyFromUri(exchange.getRequestURI());
-        System.out.println("DELETE key " + key);
         DeleteKeyCommand deleteKeyCommand = new DeleteKeyCommand(key, commandResponse -> {
             if (commandResponse instanceof DeleteKeyCommandResponse response) {
                 if (response.isSuccessful()) {
@@ -154,24 +153,7 @@ public class Server {
         BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream));
         try {
             String line = bufferedReader.readLine();
-
-            try {
-                result = Integer.valueOf(line);
-            } catch (NumberFormatException e) {
-                // ignore
-            }
-
-            try {
-                result = Double.valueOf(line);
-            } catch (NumberFormatException e) {
-                // ignore
-            }
-
-            if (line.equalsIgnoreCase("true") || line.equalsIgnoreCase("false")) {
-                result = Boolean.valueOf(line);
-            }
-
-            result = line;
+            result = TypeUtils.stringToDataType(line);
         } catch (IOException e) {
             throw new RuntimeException(e);
         }

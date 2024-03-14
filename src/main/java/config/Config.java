@@ -1,43 +1,67 @@
 package config;
 
+import kvstore.KVStoreConfig;
+import kvstore.persist.PersisterConfig;
+import server.ServerConfig;
+
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.List;
 
 public class Config {
-    private static Config config;
+    private static Config instance;
 
-    private Config() {}
-
-    private int serverPort;
-
-    public static Config getInstance() {
-        return config;
+    private Config() {
+        kvStoreConfig = new KVStoreConfig();
+        persisterConfig = new PersisterConfig();
+        serverConfig = new ServerConfig();
     }
 
-    public static void initialise(String configFilePath) throws IOException {
-        config = new Config();
+    private KVStoreConfig kvStoreConfig;
 
+    private PersisterConfig persisterConfig;
+
+    private ServerConfig serverConfig;
+
+    public static Config getInstance() {
+        if (instance == null)
+            instance = new Config();
+        return instance;
+    }
+
+    public void initialise(String configFilePath) throws IOException {
+        System.out.println("Setting KV Store config");
         List<String> lines = Files.readAllLines(Paths.get(configFilePath));
         for (String line : lines) {
-            processConfigLine(line);
+            if (!line.isEmpty())
+                processConfigLine(line);
         }
     }
 
-    private static void processConfigLine(String configLine) {
+    private void processConfigLine(String configLine) {
         String[] parts = configLine.split(":");
         String key = parts[0].trim();
         String value = parts[1].trim();
+        System.out.printf("%s: %s%n", key, value);
 
-        switch (key) {
-            case "server.port":
-                config.serverPort = Integer.parseInt(value);
-                break;
+        String configCategory = key.split("\\.")[0];
+        switch (configCategory) {
+            case "kvstore" -> kvStoreConfig.parseConfig(key, value);
+            case "persist" -> persisterConfig.parseConfig(key, value);
+            case "server" -> serverConfig.parseConfig(key, value);
         }
     }
 
-    public int getServerPort() {
-        return serverPort;
+    public KVStoreConfig getKvStoreConfig() {
+        return kvStoreConfig;
+    }
+
+    public PersisterConfig getPersisterConfig() {
+        return persisterConfig;
+    }
+
+    public ServerConfig getServerConfig() {
+        return serverConfig;
     }
 }

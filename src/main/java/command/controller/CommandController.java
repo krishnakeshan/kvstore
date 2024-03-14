@@ -1,15 +1,14 @@
 package command.controller;
 
 import command.request.Command;
-import kvstore.KVServiceImpl;
+import kvstore.service.KVService;
+import kvstore.service.KVServiceImpl;
 
 public abstract class CommandController {
-    private static CommandController defaultInstance;
+    protected final KVService kvService;
 
-    public static CommandController getDefault() {
-        if (defaultInstance == null)
-            defaultInstance = new CommandControllerImpl(KVServiceImpl.hashMapKVService());
-        return defaultInstance;
+    public CommandController(KVService kvService) {
+        this.kvService = kvService;
     }
 
     public abstract void dispatch(Command command);

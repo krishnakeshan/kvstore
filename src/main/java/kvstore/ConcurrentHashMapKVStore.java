@@ -1,10 +1,11 @@
 package kvstore;
 
-import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
-public class HashMapKVStore extends KVStore {
-    private final Map<String, Object> map = Collections.synchronizedMap(new HashMap<>());
+public class ConcurrentHashMapKVStore extends KVStore {
+    private final ConcurrentHashMap<String, Object> map = new ConcurrentHashMap<>();
 
+    @Override
     public Object put(String key, Object value) {
         boolean success = emitPutEvent(key, value);
         if (!success)
@@ -15,12 +16,14 @@ public class HashMapKVStore extends KVStore {
         return oldValue;
     }
 
+    @Override
     public Object get(String key) {
         emitGetEvent(key);
 
         return map.get(key);
     }
 
+    @Override
     public Object delete(String key) {
         boolean success = emitDeleteEvent(key);
         if (!success)
