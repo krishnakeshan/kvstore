@@ -112,7 +112,7 @@ The HTTP API is the primary (and only) way of interacting with the store. All en
 
 # Contributing
 
-This is nowhere near a perfect implementation and I would greatly appreciate your help in making this a good learning resource for everyone interested. You can email me at `krishnakeshan18@gmail.com` for errors, suggestions, questions or anything else. If you would like to make a code change to the project please feel free to create a PR and I'll take a look.
+This is nowhere near a perfect implementation and I would greatly appreciate your help in making this a good learning resource for everyone interested. If you would like to make a code change to the project please feel free to create a PR and I'll take a look. You can also email me at `krishnakeshan18@gmail.com` for errors, suggestions, questions or anything else.
 
 Before you get started though, please sign this [CLA](https://www.youtube.com/watch?v=dQw4w9WgXcQ).
  
