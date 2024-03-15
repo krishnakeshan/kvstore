@@ -17,6 +17,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.concurrent.Executors;
 
 public class Server {
     private final HttpServer httpServer;
@@ -31,6 +32,7 @@ public class Server {
 
     public Server(int port, CommandController commandController) throws IOException {
         this.httpServer = HttpServer.create(new InetSocketAddress(port), 0);
+        this.httpServer.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
         this.commandController = commandController;
 
         registerEndpoints();
