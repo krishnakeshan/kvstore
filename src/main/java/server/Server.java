@@ -72,13 +72,13 @@ public class Server {
         PutKeyCommand putKeyCommand = new PutKeyCommand(key, value, commandResponse -> {
             if (commandResponse instanceof PutKeyCommandResponse response) {
                 if (response.isSuccessful()) {
-                    try {
+                    try (exchange) {
                         exchange.sendResponseHeaders(200, -1);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 } else {
-                    try {
+                    try (exchange) {
                         exchange.sendResponseHeaders(500, -1);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -95,13 +95,13 @@ public class Server {
         GetKeyCommand getKeyCommand = new GetKeyCommand(key, commandResponse -> {
             if (commandResponse instanceof GetKeyCommandResponse response) {
                 if (response.isSuccessful()) {
-                    try {
+                    try (exchange) {
                         writeObjectToResponse(response.getValue(), exchange, true);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 } else {
-                    try {
+                    try (exchange) {
                         exchange.sendResponseHeaders(500, -1);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -117,13 +117,13 @@ public class Server {
         DeleteKeyCommand deleteKeyCommand = new DeleteKeyCommand(key, commandResponse -> {
             if (commandResponse instanceof DeleteKeyCommandResponse response) {
                 if (response.isSuccessful()) {
-                    try {
+                    try (exchange) {
                         exchange.sendResponseHeaders(200, -1);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 } else {
-                    try {
+                    try (exchange) {
                         exchange.sendResponseHeaders(500, -1);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
