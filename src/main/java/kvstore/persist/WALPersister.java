@@ -64,7 +64,7 @@ public class WALPersister extends Persister {
         return logFilePath;
     }
 
-    private void writeLogToFile(String log) throws IOException {
+    private synchronized void writeLogToFile(String log) throws IOException {
         logFileWriter.write(log);
         logFileWriter.newLine();
     }

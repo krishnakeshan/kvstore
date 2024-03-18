@@ -2,6 +2,6 @@ kvstore.implementation: concurrent_hashmap
 
 persist.implementation: wal
 persist.data_directory: /Users/krishnakeshan/dev/kvstore_data
-persist.recover_state: true
+persist.recover_state: false
 
 server.port: 8000

@@ -57,15 +57,9 @@ public class Server {
     private void registerKVStoreEndpoints() {
         httpServer.createContext("/keys", exchange -> {
             switch (HttpMethod.forValue(exchange.getRequestMethod())) {
-                case POST -> {
-                    handlePostKey(exchange);
-                }
-                case GET -> {
-                    handleGetKey(exchange);
-                }
-                case DELETE -> {
-                    handleDeleteKey(exchange);
-                }
+                case POST -> handlePostKey(exchange);
+                case GET -> handleGetKey(exchange);
+                case DELETE -> handleDeleteKey(exchange);
             }
         });
     }
@@ -73,6 +67,7 @@ public class Server {
     private void handlePostKey(HttpExchange exchange) {
         String key = getKeyFromUri(exchange.getRequestURI());
         Object value = getValueFromRequestBody(exchange.getRequestBody());
+
         PutKeyCommand putKeyCommand = new PutKeyCommand(key, value, commandResponse -> {
             if (commandResponse instanceof PutKeyCommandResponse response) {
                 if (response.isSuccessful()) {
@@ -91,6 +86,7 @@ public class Server {
                 exchange.close();
             }
         });
+
         commandController.dispatch(putKeyCommand);
     }
 
@@ -121,13 +117,13 @@ public class Server {
         DeleteKeyCommand deleteKeyCommand = new DeleteKeyCommand(key, commandResponse -> {
             if (commandResponse instanceof DeleteKeyCommandResponse response) {
                 if (response.isSuccessful()) {
-                    try {
+                    try (exchange) {
                         exchange.sendResponseHeaders(200, -1);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 } else {
-                    try {
+                    try (exchange) {
                         exchange.sendResponseHeaders(500, -1);
                     } catch (IOException e) {
                         throw new RuntimeException(e);

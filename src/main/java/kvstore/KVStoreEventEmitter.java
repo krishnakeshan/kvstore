@@ -17,7 +17,7 @@ public interface KVStoreEventEmitter {
             }
         });
 
-        return !allOk.contains(false);
+        return allOk.isEmpty();
     }
 
     default void emitGetEvent(String key) {
@@ -33,7 +33,7 @@ public interface KVStoreEventEmitter {
                 allOk.add(false);
             }
         });
-        return !allOk.contains(false);
+        return allOk.isEmpty();
     }
 
     default void registerObserver(KVStoreObserver observer) {
