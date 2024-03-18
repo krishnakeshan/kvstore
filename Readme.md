@@ -75,6 +75,10 @@ Below are the properties you can use to configure the store:
 
     A port number for the server to use. The port must not be in use by another application as no attempt is made to find another free port.
 
+- `server.backlog`
+    
+    Sets the backlog for the HTTP server. If set to <= 0, Java 21's HttpServer sets it to 50 by default.
+
 ## HTTP API
 
 The HTTP API is the primary (and only) way of interacting with the store. All endpoints return the status code `200` for a successful operation, so you should rely on this to determine success/failure.
