@@ -64,7 +64,8 @@ public class AppManager {
         commandController = new CommandControllerImpl(kvService);
 
         int port = config.getServerConfig().getPort();
-        server = new Server(port, commandController);
+        int backlog = config.getServerConfig().getBacklog();
+        server = new Server(port, backlog, commandController);
         server.start();
     }
 

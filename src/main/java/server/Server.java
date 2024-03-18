@@ -8,6 +8,7 @@ import command.request.kv.PutKeyCommand;
 import command.response.kv.DeleteKeyCommandResponse;
 import command.response.kv.GetKeyCommandResponse;
 import command.response.kv.PutKeyCommandResponse;
+import config.Config;
 import util.TypeUtils;
 
 import java.io.*;
@@ -30,8 +31,8 @@ public class Server {
             putMethodFilter = new HttpMethodFilter(HttpMethod.PUT),
             deleteMethodFilter = new HttpMethodFilter(HttpMethod.DELETE);
 
-    public Server(int port, CommandController commandController) throws IOException {
-        this.httpServer = HttpServer.create(new InetSocketAddress(port), 0);
+    public Server(int port, int backlog, CommandController commandController) throws IOException {
+        this.httpServer = HttpServer.create(new InetSocketAddress(port), backlog);
         this.httpServer.setExecutor(Executors.newVirtualThreadPerTaskExecutor());
         this.commandController = commandController;
 
@@ -83,7 +84,6 @@ public class Server {
                         throw new RuntimeException(e);
                     }
                 }
-                exchange.close();
             }
         });
 
@@ -117,13 +117,13 @@ public class Server {
         DeleteKeyCommand deleteKeyCommand = new DeleteKeyCommand(key, commandResponse -> {
             if (commandResponse instanceof DeleteKeyCommandResponse response) {
                 if (response.isSuccessful()) {
-                    try (exchange) {
+                    try {
                         exchange.sendResponseHeaders(200, -1);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
                     }
                 } else {
-                    try (exchange) {
+                    try {
                         exchange.sendResponseHeaders(500, -1);
                     } catch (IOException e) {
                         throw new RuntimeException(e);
@@ -184,7 +184,6 @@ public class Server {
                 chain.doFilter(exchange);
             else {
                 exchange.sendResponseHeaders(405, -1);
-                exchange.close();
             }
         }
 

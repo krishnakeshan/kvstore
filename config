@@ -5,3 +5,4 @@ persist.data_directory: /Users/krishnakeshan/dev/kvstore_data
 persist.recover_state: false
 
 server.port: 8000
+server.backlog: 50
